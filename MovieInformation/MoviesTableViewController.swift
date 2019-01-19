@@ -165,22 +165,22 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         let movie: Movie = self.movies[indexPath.row]
         
         //Cell Configuration
-        cell.thumbnailImage.image = UIImage(named: "img_placeholder")
-        cell.titleLabel?.text = movie.title
-        cell.detailLabel?.text = "평점 : \(movie.userRating) 예매순위 : \(movie.reservationGrade) 예매율 : \(movie.reservationRate)"
-        cell.dateLabel?.text = "개봉일 : \(movie.date)"
-        if movie.grade == 0 {
-            cell.ageRestrictImage?.image = UIImage(named: "ic_allages")
-        } else {
-        cell.ageRestrictImage?.image = UIImage(named: "ic_\(movie.grade)")
-        }
-        cell.thumbnailImage.image = self.cachedImage[URL(string: movie.thumb)!] ?? UIImage(named:"img_placeholder")
+        cell.movie = movie
         
         //Image Loding
+        self.setTableViewCellImage(thumb: movie.thumb) { (image) in
+            cell.thumbImage = image ?? UIImage(named: "img_placeholder")
+        }
         
-        let thumbURL: URL = URL(string: movie.thumb)!
-        if(self.cachedImage[thumbURL] != nil){
-            return cell
+        return cell
+    }
+    
+    private func setTableViewCellImage(thumb: String, completion: @escaping (UIImage?) -> Void) {
+        //Image Loding
+        
+        let thumbURL: URL = URL(string: thumb)!
+        if self.cachedImage[thumbURL] != nil {
+            completion(self.cachedImage[thumbURL])
         }
         let imageDispatchQueue: DispatchQueue = DispatchQueue(label: "image")
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -195,12 +195,11 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
                 return
             }
             let image: UIImage? = UIImage(data: data)
-            DispatchQueue.main.async {
-                cell.thumbnailImage.image = image ?? UIImage(named: "img_placeholder")
-            }
             self.cachedImage[thumbURL] = image
+            DispatchQueue.main.async {
+                completion(image)
+            }
         }
-        return cell
     }
     
     //화면 전환

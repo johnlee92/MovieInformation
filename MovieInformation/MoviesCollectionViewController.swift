@@ -157,23 +157,23 @@ class MoviesCollectionViewController: UIViewController, UICollectionViewDataSour
         let movie: Movie = self.movies[indexPath.row]
        
         //Cell Configuration
-        cell.thumbnailImage.image = UIImage(named: "img_placeholder")
-        cell.titleLabel?.text = movie.title
-        cell.detailLabel?.text = "\(movie.reservationGrade)위(\(movie.userRating)) / \(movie.reservationRate)%"
-        cell.dateLabel?.text = movie.date
-        //cell.thumbnailImage.image = cachedImage[URL(string: movie.thumb)!] ?? UIImage(named: "img_placeholder")
-        if movie.grade == 0 {
-            cell.ageRestrictImage?.image = UIImage(named: "ic_allages")
-        } else {
-            cell.ageRestrictImage?.image = UIImage(named: "ic_\(movie.grade)")
-        }
-        cell.thumbnailImage.image = self.cachedImage[URL(string: movie.thumb)!] ?? UIImage(named:"img_placeholder")
+        cell.movie = movie
         
         //Image Loding
+        self.setCollectionViewCellImage(thumb: movie.thumb) { (image) in
+            cell.thumbImage = image ?? UIImage(named: "img_placeholder")
+        }
+    
+        return cell
+       
+    }
+    
+    private func setCollectionViewCellImage(thumb: String, completion: @escaping (UIImage?) -> Void) {
+        //Image Loding
         
-        let thumbURL: URL = URL(string: movie.thumb)!
-        if(self.cachedImage[thumbURL] != nil){
-            return cell
+        let thumbURL: URL = URL(string: thumb)!
+        if self.cachedImage[thumbURL] != nil {
+            completion(self.cachedImage[thumbURL])
         }
         let imageDispatchQueue: DispatchQueue = DispatchQueue(label: "image")
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -188,14 +188,11 @@ class MoviesCollectionViewController: UIViewController, UICollectionViewDataSour
                 return
             }
             let image: UIImage? = UIImage(data: data)
-            DispatchQueue.main.async {
-                cell.thumbnailImage.image = image ?? UIImage(named: "img_placeholder")
-            }
             self.cachedImage[thumbURL] = image
+            DispatchQueue.main.async {
+                completion(image)
+            }
         }
-    
-        return cell
-       
     }
 
     // 화면 전환

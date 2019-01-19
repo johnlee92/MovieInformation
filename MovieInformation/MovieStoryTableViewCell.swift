@@ -12,6 +12,13 @@ class MovieStoryTableViewCell: UITableViewCell {
     
     @IBOutlet weak var movieStoryLabel: UILabel!
     
+    public var movieDetail: MovieDetail? {
+        didSet {
+            guard let movieDetail = movieDetail else { return }
+            
+            self.movieStoryLabel?.text = movieDetail.synopsis
+        }
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()

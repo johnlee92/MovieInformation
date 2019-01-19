@@ -13,6 +13,14 @@ class MovieMakerTableViewCell: UITableViewCell {
     @IBOutlet weak var movieDirectorLabel: UILabel!
     @IBOutlet weak var movieActorLabel: UILabel!
     
+    var movieDetail: MovieDetail? {
+        didSet {
+            guard let movieDetail = movieDetail else { return }
+            
+            self.movieDirectorLabel?.text = movieDetail.director
+            self.movieActorLabel?.text = movieDetail.actor
+        }
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()

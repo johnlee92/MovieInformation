@@ -162,71 +162,20 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             // Movie Information Cell Configuration
             
-            cell.movieThumbnailImage.setImage(self.currentImage, for: UIControl.State.normal)
-            cell.movieTitleLabel?.text = self.currentMovie.title
-            
-            if self.currentMovie.grade == 0 {
-                cell.movieAgeRestrict?.image = UIImage(named: "ic_allages")
-            } else {
-                cell.movieAgeRestrict?.image = UIImage(named: "ic_\(self.currentMovie.grade)")
-            }
-            cell.movieDataLabel?.text = "\(self.currentMovie.date) 개봉"
-            cell.movieReservationRate?.text = "\(self.currentMovie.reservationGrade)위 \(self.currentMovie.reservationRate)%"
-            cell.movieUserRating?.text = "\(self.currentMovie.userRating)"
+            cell.thumbImage = self.currentImage
+            cell.currentMovie = self.currentMovie
             
             // Movie Detail Information Configuration
             
             guard let movieDetail: MovieDetail = self.currentMovieDetail else {
                 return cell
             }
-            
-            cell.genreRunningTimeLabel?.text = "\(movieDetail.genre)/\(movieDetail.duration)분"
-            
-            let withSeparator: NumberFormatter = {
-                let formatter = NumberFormatter()
-                formatter.groupingSeparator = ","
-                formatter.numberStyle = .decimal
-                return formatter
-            }()
-            
-            let audience = withSeparator.string(from: movieDetail.audience as NSNumber)
-            cell.movieTotalViewer?.text = audience
-            
+            cell.movieDetail = movieDetail
             
             
             // Star Visualizing
             
-            if(movieDetail.userRating >= 1){
-                cell.starNumber1.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieDetail.userRating >= 2){
-                cell.starNumber1.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieDetail.userRating >= 3){
-                cell.starNumber2.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieDetail.userRating >= 4){
-                cell.starNumber2.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieDetail.userRating >= 5){
-                cell.starNumber3.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieDetail.userRating >= 6){
-                cell.starNumber3.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieDetail.userRating >= 7){
-                cell.starNumber4.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieDetail.userRating >= 8){
-                cell.starNumber4.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieDetail.userRating >= 9){
-                cell.starNumber5.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieDetail.userRating == 10){
-                cell.starNumber5.image = UIImage(named: "ic_star_large_full")
-            }
-            
+            cell.userRating = movieDetail.userRating
             
             return cell
         
@@ -238,7 +187,7 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 return cell
             }
             
-            cell.movieStoryLabel?.text = movieDetail.synopsis
+            cell.movieDetail = movieDetail
             
             return cell
         
@@ -249,8 +198,7 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 return cell
             }
             
-            cell.movieDirectorLabel?.text = movieDetail.director
-            cell.movieActorLabel?.text = movieDetail.actor
+            cell.movieDetail = movieDetail
             
             return cell
 
@@ -269,16 +217,7 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 return cell
             }
                 
-                
-            cell.userIDLabel?.text = movieComment.writer
-                
-            let date = Date(timeIntervalSince1970: movieComment.timeStamp)
-            let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            let stringDate = dateFormatter.string(from: date)
-                
-            cell.commentDateLabel?.text = stringDate
-            cell.commentContentLabel?.text = movieComment.contents
+            cell.movieComment = movieComment
                 
             //Star Initializing
             cell.starNumber1.image = UIImage(named: "ic_star_large")
@@ -288,36 +227,7 @@ class MovieViewController: UIViewController, UITableViewDelegate, UITableViewDat
             cell.starNumber5.image = UIImage(named: "ic_star_large")
                 
             //Star Visualizing
-            if(movieComment.rating >= 1){
-                cell.starNumber1.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieComment.rating >= 2){
-                cell.starNumber1.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieComment.rating >= 3){
-                cell.starNumber2.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieComment.rating >= 4){
-                cell.starNumber2.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieComment.rating >= 5){
-                cell.starNumber3.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieComment.rating >= 6){
-                cell.starNumber3.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieComment.rating >= 7){
-                cell.starNumber4.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieComment.rating >= 8){
-                cell.starNumber4.image = UIImage(named: "ic_star_large_full")
-            }
-            if(movieComment.rating >= 9){
-                cell.starNumber5.image = UIImage(named: "ic_star_large_half")
-            }
-            if(movieComment.rating == 10){
-                cell.starNumber5.image = UIImage(named: "ic_star_large_full")
-            }
+            cell.userRating = movieComment.rating
                 
             return cell
             }
