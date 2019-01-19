@@ -11,11 +11,14 @@ import UIKit
 class MoviesCollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     
-    let collectionViewCellIdentifier = "collectionViewCell"
     var movies: [Movie] = []
     var thumbURLList: [String] = []
     var cachedImage: [URL: UIImage] = [:]
-    let showMovieInfoSegue: String = "showMovieInfo"
+    
+    struct Const {
+        static let collectionViewCellIdentifier = "collectionViewCell"
+        static let showMovieInfoSegue: String = "showMovieInfo"
+    }
     
     @IBOutlet weak var collectionView: UICollectionView!
     
@@ -149,7 +152,7 @@ class MoviesCollectionViewController: UIViewController, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell: MoviesCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: self.collectionViewCellIdentifier, for: indexPath) as! MoviesCollectionViewCell
+        let cell: MoviesCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: Const.collectionViewCellIdentifier, for: indexPath) as! MoviesCollectionViewCell
         
         let movie: Movie = self.movies[indexPath.row]
        
@@ -198,12 +201,12 @@ class MoviesCollectionViewController: UIViewController, UICollectionViewDataSour
     // 화면 전환
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedMovie: Movie = self.movies[indexPath.item]
-        performSegue(withIdentifier: self.showMovieInfoSegue, sender: selectedMovie)
+        performSegue(withIdentifier: Const.showMovieInfoSegue, sender: selectedMovie)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.identifier == self.showMovieInfoSegue {
+        if segue.identifier == Const.showMovieInfoSegue {
             if let destViewController = segue.destination as? MovieViewController {
                 let selectedMovie: Movie = (sender as? Movie)!
                 destViewController.currentMovie = selectedMovie

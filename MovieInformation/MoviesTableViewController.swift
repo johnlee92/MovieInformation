@@ -11,11 +11,14 @@ import UIKit
 class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     
-    let tableViewCellIndentifier: String = "tableViewCell"
     var movies: [Movie] = []
     var thumbURLList: [String] = []
     var cachedImage: [URL: UIImage] = [:]
-    let showMovieInfoSegue: String = "showMovieInfo"
+    
+    struct Const {
+        static let tableViewCellIndentifier: String = "tableViewCell"
+        static let showMovieInfoSegue: String = "showMovieInfo"
+    }
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -156,7 +159,7 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         
         let basicCell: UITableViewCell = UITableViewCell(style: .default, reuseIdentifier: nil)
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: self.tableViewCellIndentifier , for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Const.tableViewCellIndentifier , for: indexPath)
             as? MoviesTableViewCell else { return basicCell }
         
         let movie: Movie = self.movies[indexPath.row]
@@ -204,12 +207,12 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let selectedMovie: Movie = self.movies[indexPath.row]
-        performSegue(withIdentifier: self.showMovieInfoSegue, sender: selectedMovie)
+        performSegue(withIdentifier: Const.showMovieInfoSegue, sender: selectedMovie)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.identifier == self.showMovieInfoSegue {
+        if segue.identifier == Const.showMovieInfoSegue {
             if let destViewController = segue.destination as? MovieViewController {
                 let selectedMovie: Movie = (sender as? Movie)!
                 destViewController.currentMovie = selectedMovie
