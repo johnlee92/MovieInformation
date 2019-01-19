@@ -30,19 +30,14 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.loadMovies()
-        self.updateTitle()
+        self.updateSorting()
     }
     
-    func updateTitle(){
-        
-        switch UserPreference.shared.sortingOption {
-        case .curation:
-            self.navigationItem.title = "큐레이션"
-        case .date:
-            self.navigationItem.title = "개봉일순"
-        default:
-            self.navigationItem.title = "예매율순"
+    func updateSorting(type: UserPreference.Sorting? = nil){
+        if let type = type {
+            UserPreference.shared.sortingOption = type
         }
+        self.navigationItem.title = UserPreference.shared.sortingOption.titleString
     }
     
     
@@ -117,21 +112,24 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         let cancelAction: UIAlertAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
 
-        let reservationRateAction: UIAlertAction = UIAlertAction(title: "예매율", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .reservationRate
-            self.navigationItem.title = "예매율순"
+        let reservationRateAction: UIAlertAction = UIAlertAction(title: "예매율",
+                                                                 style: .default,
+                                                                 handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .reservationRate)
             self.loadMovies()
         })
         
-        let curationAction: UIAlertAction = UIAlertAction(title: "큐레이션", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .curation
-            self.navigationItem.title = "큐레이션"
+        let curationAction: UIAlertAction = UIAlertAction(title: "큐레이션",
+                                                          style: .default,
+                                                          handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .curation)
             self.loadMovies()
         })
         
-        let dateAction: UIAlertAction = UIAlertAction(title: "개봉일", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .date
-            self.navigationItem.title = "개봉일순"
+        let dateAction: UIAlertAction = UIAlertAction(title: "개봉일",
+                                                      style: .default,
+                                                      handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .date)
             self.loadMovies()
         })
         
@@ -140,7 +138,7 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         alert.addAction(curationAction)
         alert.addAction(dateAction)
         
-        self.present(alert, animated: true, completion: {self.updateTitle()})
+        self.present(alert, animated: true, completion: nil)
     
     }
     
