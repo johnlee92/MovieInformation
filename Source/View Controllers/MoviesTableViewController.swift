@@ -164,7 +164,7 @@ class MoviesTableViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.identifier == self.showMovieInfoSegue {
+        if segue.identifier == Const.showMovieInfoSegue {
             if let destViewController = segue.destination as? MovieViewController {
                 let selectedMovie: Movie = (sender as? Movie)!
                 destViewController.currentMovie = selectedMovie
