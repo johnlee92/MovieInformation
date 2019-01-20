@@ -8,8 +8,9 @@
 
 import UIKit
 
-class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class MoviesTableViewController: UIViewController {
     
+    // MARK: - Properties
     
     let tableViewCellIndentifier: String = "tableViewCell"
     var movies: [Movie] = []
@@ -19,8 +20,8 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var tableView: UITableView!
     
+    // MARK: - Life Cycle Methods
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.loadMovies()
@@ -33,18 +34,7 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         self.updateTitle()
     }
     
-    func updateTitle(){
-        
-        switch UserPreference.shared.sortingOption {
-        case .curation:
-            self.navigationItem.title = "큐레이션"
-        case .date:
-            self.navigationItem.title = "개봉일순"
-        default:
-            self.navigationItem.title = "예매율순"
-        }
-    }
-    
+    // MARK: - Networking Methods
     
     private func getServerURL(connectWith subURL: String) -> URL? {
         let baseURL = "https://connect-boxoffice.run.goorm.io/"
@@ -52,11 +42,10 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         return finalURL
     }
     
-    func loadMovies(){
+    private func loadMovies(){
         
         guard let url = self.getServerURL(connectWith: "movies?order_type=\(UserPreference.shared.sortingOption.rawValue)") else {
             return }
-        
         
         let session: URLSession = URLSession(configuration: .default)
         let dataTask: URLSessionDataTask = session.dataTask(with: url) {
@@ -108,6 +97,20 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         
     }
     
+    // MARK: - Supporing Methods
+    
+    private func updateTitle(){
+        
+        switch UserPreference.shared.sortingOption {
+        case .curation:
+            self.navigationItem.title = "큐레이션"
+        case .date:
+            self.navigationItem.title = "개봉일순"
+        default:
+            self.navigationItem.title = "예매율순"
+        }
+    }
+    
     @IBAction func touchUpSortingOptionButton(_ sender: UIBarButtonItem) {
         
         let alert: UIAlertController
@@ -144,15 +147,26 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
     
     }
     
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == self.showMovieInfoSegue {
+            if let destViewController = segue.destination as? MovieViewController {
+                let selectedMovie: Movie = (sender as? Movie)!
+                destViewController.currentMovie = selectedMovie
+                destViewController.currentImage = self.cachedImage[URL(string: (selectedMovie.thumb))!]
+                destViewController.loadMovieDetail()
+                destViewController.loadMovieComments()
+            }
+        }
     }
-    
+}
+
+// MARK: - UITableViewController DataSource Methods
+
+extension MoviesTableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.movies.count
     }
-    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -171,7 +185,7 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         if movie.grade == 0 {
             cell.ageRestrictImage?.image = UIImage(named: "ic_allages")
         } else {
-        cell.ageRestrictImage?.image = UIImage(named: "ic_\(movie.grade)")
+            cell.ageRestrictImage?.image = UIImage(named: "ic_\(movie.grade)")
         }
         cell.thumbnailImage.image = self.cachedImage[URL(string: movie.thumb)!] ?? UIImage(named:"img_placeholder")
         
@@ -201,27 +215,14 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         }
         return cell
     }
-    
-    //화면 전환
+}
+
+// MARK: - UITableViewController Delegate Methods
+
+extension MoviesTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let selectedMovie: Movie = self.movies[indexPath.row]
         performSegue(withIdentifier: self.showMovieInfoSegue, sender: selectedMovie)
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier == self.showMovieInfoSegue {
-            if let destViewController = segue.destination as? MovieViewController {
-                let selectedMovie: Movie = (sender as? Movie)!
-                destViewController.currentMovie = selectedMovie
-                destViewController.currentImage = self.cachedImage[URL(string: (selectedMovie.thumb))!]
-                destViewController.loadMovieDetail()
-                destViewController.loadMovieComments()
-            }
-        }
-    }
-    
 }
-        
-

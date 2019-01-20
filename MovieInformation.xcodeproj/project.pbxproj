@@ -331,13 +331,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = FFS96T37YK;
+				DEVELOPMENT_TEAM = 4U9B5GDBZA;
 				INFOPLIST_FILE = MovieInformation/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.naver.app.test123.MovieInformation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naver.app.test123.MovieInformation1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -349,13 +349,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = FFS96T37YK;
+				DEVELOPMENT_TEAM = 4U9B5GDBZA;
 				INFOPLIST_FILE = MovieInformation/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.naver.app.test123.MovieInformation;
+				PRODUCT_BUNDLE_IDENTIFIER = com.naver.app.test123.MovieInformation1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
