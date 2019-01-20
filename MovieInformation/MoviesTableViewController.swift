@@ -11,11 +11,14 @@ import UIKit
 class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     
-    let tableViewCellIndentifier: String = "tableViewCell"
     var movies: [Movie] = []
     var thumbURLList: [String] = []
     var cachedImage: [URL: UIImage] = [:]
-    let showMovieInfoSegue: String = "showMovieInfo"
+    
+    struct Const {
+        static let tableViewCellIndentifier: String = "tableViewCell"
+        static let showMovieInfoSegue: String = "showMovieInfo"
+    }
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -30,19 +33,14 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.loadMovies()
-        self.updateTitle()
+        self.updateSorting()
     }
     
-    func updateTitle(){
-        
-        switch UserPreference.shared.sortingOption {
-        case .curation:
-            self.navigationItem.title = "큐레이션"
-        case .date:
-            self.navigationItem.title = "개봉일순"
-        default:
-            self.navigationItem.title = "예매율순"
+    func updateSorting(type: UserPreference.Sorting? = nil){
+        if let type = type {
+            UserPreference.shared.sortingOption = type
         }
+        self.navigationItem.title = UserPreference.shared.sortingOption.titleString
     }
     
     
@@ -117,21 +115,24 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         let cancelAction: UIAlertAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
         
 
-        let reservationRateAction: UIAlertAction = UIAlertAction(title: "예매율", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .reservationRate
-            self.navigationItem.title = "예매율순"
+        let reservationRateAction: UIAlertAction = UIAlertAction(title: "예매율",
+                                                                 style: .default,
+                                                                 handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .reservationRate)
             self.loadMovies()
         })
         
-        let curationAction: UIAlertAction = UIAlertAction(title: "큐레이션", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .curation
-            self.navigationItem.title = "큐레이션"
+        let curationAction: UIAlertAction = UIAlertAction(title: "큐레이션",
+                                                          style: .default,
+                                                          handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .curation)
             self.loadMovies()
         })
         
-        let dateAction: UIAlertAction = UIAlertAction(title: "개봉일", style: .default, handler: {(alert: UIAlertAction!) in
-            UserPreference.shared.sortingOption = .date
-            self.navigationItem.title = "개봉일순"
+        let dateAction: UIAlertAction = UIAlertAction(title: "개봉일",
+                                                      style: .default,
+                                                      handler: {(alert: UIAlertAction!) in
+            self.updateSorting(type: .date)
             self.loadMovies()
         })
         
@@ -140,7 +141,7 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         alert.addAction(curationAction)
         alert.addAction(dateAction)
         
-        self.present(alert, animated: true, completion: {self.updateTitle()})
+        self.present(alert, animated: true, completion: nil)
     
     }
     
@@ -158,28 +159,28 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
         
         let basicCell: UITableViewCell = UITableViewCell(style: .default, reuseIdentifier: nil)
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: self.tableViewCellIndentifier , for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Const.tableViewCellIndentifier , for: indexPath)
             as? MoviesTableViewCell else { return basicCell }
         
         let movie: Movie = self.movies[indexPath.row]
         
         //Cell Configuration
-        cell.thumbnailImage.image = UIImage(named: "img_placeholder")
-        cell.titleLabel?.text = movie.title
-        cell.detailLabel?.text = "평점 : \(movie.userRating) 예매순위 : \(movie.reservationGrade) 예매율 : \(movie.reservationRate)"
-        cell.dateLabel?.text = "개봉일 : \(movie.date)"
-        if movie.grade == 0 {
-            cell.ageRestrictImage?.image = UIImage(named: "ic_allages")
-        } else {
-        cell.ageRestrictImage?.image = UIImage(named: "ic_\(movie.grade)")
-        }
-        cell.thumbnailImage.image = self.cachedImage[URL(string: movie.thumb)!] ?? UIImage(named:"img_placeholder")
+        cell.movie = movie
         
         //Image Loding
+        self.setTableViewCellImage(thumb: movie.thumb) { (image) in
+            cell.thumbImage = image ?? UIImage(named: "img_placeholder")
+        }
         
-        let thumbURL: URL = URL(string: movie.thumb)!
-        if(self.cachedImage[thumbURL] != nil){
-            return cell
+        return cell
+    }
+    
+    private func setTableViewCellImage(thumb: String, completion: @escaping (UIImage?) -> Void) {
+        //Image Loding
+        
+        let thumbURL: URL = URL(string: thumb)!
+        if self.cachedImage[thumbURL] != nil {
+            completion(self.cachedImage[thumbURL])
         }
         let imageDispatchQueue: DispatchQueue = DispatchQueue(label: "image")
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -194,24 +195,23 @@ class MoviesTableViewController: UIViewController, UITableViewDelegate, UITableV
                 return
             }
             let image: UIImage? = UIImage(data: data)
-            DispatchQueue.main.async {
-                cell.thumbnailImage.image = image ?? UIImage(named: "img_placeholder")
-            }
             self.cachedImage[thumbURL] = image
+            DispatchQueue.main.async {
+                completion(image)
+            }
         }
-        return cell
     }
     
     //화면 전환
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let selectedMovie: Movie = self.movies[indexPath.row]
-        performSegue(withIdentifier: self.showMovieInfoSegue, sender: selectedMovie)
+        performSegue(withIdentifier: Const.showMovieInfoSegue, sender: selectedMovie)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        if segue.identifier == self.showMovieInfoSegue {
+        if segue.identifier == Const.showMovieInfoSegue {
             if let destViewController = segue.destination as? MovieViewController {
                 let selectedMovie: Movie = (sender as? Movie)!
                 destViewController.currentMovie = selectedMovie
